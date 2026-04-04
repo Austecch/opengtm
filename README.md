@@ -1,10 +1,17 @@
 <!-- keywords: claude code gtm automation, ai lead generation python, answer engine optimization tool, aeo checker open source, cold outreach automation, icp scoring, lead qualification python, open source sales tools, ai content pipeline, outreach automation python -->
 
-# opengtm — AI-powered GTM automation for Claude Code
+# opengtm
+
+**Open source AI GTM toolkit.** Find leads, score ICP fit, generate outreach, audit AEO health, and research keywords — all from your terminal.
+
+No Clay. No Apollo. No Semrush. Just a Gemini API key.
 
 ![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)
 ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 ![GitHub stars](https://img.shields.io/github/stars/buildingopen/opengtm?style=social)
+
+> **Demo:** `opengtm analytics --url your-site.com` -> instant AEO health report with grade A+ to F
+> Full pipeline demo GIF coming soon — [watch the repo](https://github.com/buildingopen/opengtm) for updates.
 
 One toolkit for the full GTM loop. Discover B2B leads, research decision-makers, score ICP fit, generate personalized outreach, run multi-touch sequences, and track your AI visibility — all from the terminal.
 
@@ -249,18 +256,22 @@ Supports English and German. German output uses DACH-calibrated formal address (
 
 ## Comparison
 
-| Feature | opengtm | Clay.run | Apollo.io | Instantly.ai |
-|---------|---------|----------|-----------|-------------|
-| Lead discovery | AI-powered | Yes | Yes | No |
-| ICP scoring | Customizable 6-dimension | Basic | Yes | No |
-| AEO health check | 29 checks, tiered | No | No | No |
-| Content pipeline | Blog + Keywords + Context | No | No | No |
-| Outreach sequences | 4-touch with daily limits | Yes | Yes | Yes |
-| Open source | MIT | No | No | No |
-| Cost | Free (API costs only) | $800/mo | $99/mo | $97/mo |
-| Claude Code integration | Native | No | No | No |
-| German language support | Full (DACH-calibrated) | No | No | No |
-| Runs locally | Yes | No | No | No |
+| Feature | opengtm | Clay.run | Apollo.io | Instantly.ai | Semrush | Clearbit | AEO SaaS tools |
+|---------|---------|----------|-----------|-------------|---------|----------|---------------|
+| Lead discovery | AI-powered | Yes | Yes | No | No | Yes | No |
+| ICP scoring | Customizable 6-dimension | Basic | Yes | No | No | Yes | No |
+| AEO health check | 29 checks, tiered | No | No | No | Partial | No | Yes |
+| Content pipeline | Blog + Keywords + Context | No | No | No | Yes | No | No |
+| Outreach sequences | 4-touch with daily limits | Yes | Yes | Yes | No | No | No |
+| Open source | MIT | No | No | No | No | No | No |
+| Claude Code integration | Native | No | No | No | No | No | No |
+| German language support | Full (DACH-calibrated) | No | No | No | No | No | No |
+| Runs locally | Yes | No | No | No | No | No | No |
+| **Monthly cost** | **Free*** | **$400/mo** | **$99/mo** | **$30/mo** | **$130/mo** | **$99/mo** | **$49/mo** |
+
+**Total if you replaced opengtm with all of the above: ~$807/month → $0 + Gemini API key**
+
+\* Gemini free tier: 1,500 requests/day. Sufficient for most small teams.
 
 ## Use Case Personas
 
