@@ -9,6 +9,11 @@ Commands:
   opengtm pipeline  - Run full end-to-end pipeline
   opengtm outreach  - Show/manage outreach sequence queue
   opengtm sync      - Push leads to Google Sheet CRM
+  opengtm context   - Extract company context from a URL
+  opengtm analytics - Run AEO health check (29 checks) + AI visibility
+  opengtm blog      - Generate blog article with Gemini + Google Search
+  opengtm keywords  - Research SEO keywords (7-stage pipeline)
+  opengtm sitemap   - Crawl and classify sitemap URLs
 """
 
 from __future__ import annotations
@@ -18,6 +23,8 @@ import json
 import os
 import sys
 from pathlib import Path
+
+from .outreach import DEFAULT_DAILY_LIMIT
 
 
 def _load_dotenv():
@@ -293,6 +300,180 @@ def cmd_sync(args):
     sync_leads(sync_data, dry_run=args.dry_run, verbose=True)
 
 
+def cmd_context(args):
+    """Extract company context from a URL."""
+    from .context import extract_context
+
+    print(f"[context] Extracting context for {args.url}", flush=True)
+
+    user_context = None
+    if args.country or args.language:
+        user_context = {}
+        if args.country:
+            user_context["country"] = args.country
+        if args.language:
+            user_context["language"] = args.language
+
+    result = extract_context(
+        url=args.url,
+        user_context=user_context,
+        fallback_on_error=not args.strict,
+    )
+
+    output_path = args.output or "/tmp/opengtm-context.json"
+    with open(output_path, "w") as f:
+        json.dump(result, f, indent=2, ensure_ascii=False)
+
+    print(f"Company: {result.get('company_name', 'Unknown')}", flush=True)
+    print(f"Industry: {result.get('industry', '')}", flush=True)
+    print(f"Products: {', '.join(result.get('products', [])[:3])}", flush=True)
+    print(f"\nContext -> {output_path}", flush=True)
+
+
+def cmd_analytics(args):
+    """Run AEO health check and/or AI visibility check."""
+    from .analytics import run_health_check, run_mentions
+
+    if args.health_only or not args.company:
+        if not args.url:
+            print("ERROR: --url required for health check", file=sys.stderr)
+            sys.exit(1)
+        print(f"[analytics] Health check: {args.url}", flush=True)
+        result = run_health_check(args.url)
+        output_path = args.output or "/tmp/opengtm-analytics.json"
+        with open(output_path, "w") as f:
+            json.dump(result, f, indent=2, ensure_ascii=False)
+        print(f"Score: {result.get('score', 0)} | Grade: {result.get('grade', '?')}", flush=True)
+        print(f"\nResults -> {output_path}", flush=True)
+
+    elif args.mentions_only or not args.url:
+        if not args.company:
+            print("ERROR: --company required for mentions check", file=sys.stderr)
+            sys.exit(1)
+        print(f"[analytics] Mentions check: {args.company}", flush=True)
+        result = run_mentions(
+            domain=args.url or "",
+            company_name=args.company,
+            industry=args.industry or "",
+        )
+        output_path = args.output or "/tmp/opengtm-mentions.json"
+        with open(output_path, "w") as f:
+            json.dump(result, f, indent=2, ensure_ascii=False)
+        print(f"Visibility: {result.get('visibility_score', 0):.1f}% | Queries: {result.get('queries_tested', 0)}", flush=True)
+        print(f"\nResults -> {output_path}", flush=True)
+
+    else:
+        # Full: both stages
+        print(f"[analytics] Full analysis: {args.url} | {args.company}", flush=True)
+        health = run_health_check(args.url)
+        mentions = run_mentions(
+            domain=args.url,
+            company_name=args.company,
+            industry=args.industry or "",
+        )
+        result = {
+            "url": args.url,
+            "company": args.company,
+            "health": health,
+            "mentions": mentions,
+        }
+        output_path = args.output or "/tmp/opengtm-analytics.json"
+        with open(output_path, "w") as f:
+            json.dump(result, f, indent=2, ensure_ascii=False)
+        print(f"Health: {health.get('score', 0)} ({health.get('grade', '?')}) | Visibility: {mentions.get('visibility_score', 0):.1f}%", flush=True)
+        print(f"\nResults -> {output_path}", flush=True)
+
+
+def cmd_blog(args):
+    """Generate a blog article."""
+    from .blog import generate_article
+
+    print(f"[blog] Generating article: '{args.keyword}' for {args.domain}", flush=True)
+
+    context = None
+    if args.context:
+        with open(args.context) as f:
+            context = json.load(f)
+
+    result = generate_article(
+        domain=args.domain,
+        keyword=args.keyword,
+        context=context,
+        word_count=args.word_count,
+        language=args.language,
+        country=args.country,
+        verify_urls=args.verify_urls,
+    )
+
+    output_path = args.output or "/tmp/opengtm-blog.json"
+    with open(output_path, "w") as f:
+        json.dump(result, f, indent=2, ensure_ascii=False)
+
+    print(f"Title: {result.get('title', '')}", flush=True)
+    print(f"Words: {result.get('word_count', 0)} | Sources: {len(result.get('sources', []))}", flush=True)
+    if result.get("is_too_similar"):
+        print(f"WARNING: High similarity {result['similarity_score']:.1%} - possible content cannibalization", flush=True)
+    print(f"\nArticle -> {output_path}", flush=True)
+
+
+def cmd_keywords(args):
+    """Research SEO keywords."""
+    from .keywords import research_keywords
+
+    print(f"[keywords] Researching keywords for {args.domain} (limit: {args.limit})", flush=True)
+
+    context = None
+    if args.context:
+        with open(args.context) as f:
+            context = json.load(f)
+
+    results = research_keywords(
+        domain=args.domain,
+        context=context,
+        limit=args.limit,
+        language=args.language,
+        region=args.region,
+        min_score=args.min_score,
+        cluster_count=args.clusters,
+        generate_briefs=not args.no_briefs,
+    )
+
+    output_path = args.output or "/tmp/opengtm-keywords.json"
+    with open(output_path, "w") as f:
+        json.dump(results, f, indent=2, ensure_ascii=False)
+
+    print(f"\n{len(results)} keywords found", flush=True)
+    if results:
+        top5 = results[:5]
+        print(f"Top 5:", flush=True)
+        for kw in top5:
+            brief_flag = " [brief]" if kw.get("content_brief") else ""
+            print(f"  [{kw.get('score', 0):3d}] {kw['keyword']} ({kw.get('cluster', '?')}){brief_flag}", flush=True)
+    print(f"\nKeywords -> {output_path}", flush=True)
+
+
+def cmd_sitemap(args):
+    """Crawl and classify sitemap URLs."""
+    from .sitemap import crawl_sitemap
+
+    print(f"[sitemap] Crawling {args.url}", flush=True)
+
+    result = crawl_sitemap(
+        url=args.url,
+        validate=args.validate,
+        max_urls=args.max_urls,
+    )
+
+    output_path = args.output or "/tmp/opengtm-sitemap.json"
+    with open(output_path, "w") as f:
+        json.dump(result, f, indent=2, ensure_ascii=False)
+
+    print(f"Total pages: {result['total_pages']}", flush=True)
+    print(f"Blog: {len(result['blog_urls'])} | Product: {len(result['product_urls'])} | Service: {len(result['service_urls'])}", flush=True)
+    print(f"Docs: {len(result['docs_urls'])} | Resource: {len(result['resource_urls'])} | Other: {len(result['other_urls'])}", flush=True)
+    print(f"\nSitemap -> {output_path}", flush=True)
+
+
 def main():
     _load_dotenv()
 
@@ -310,6 +491,11 @@ Examples:
   opengtm outreach load --input qualified.json --state-file seq.json
   opengtm outreach queue --state-file seq.json
   opengtm sync --input generated.json --dry-run
+  opengtm context --url https://example.com
+  opengtm analytics --url https://example.com --company "Example Corp"
+  opengtm blog --domain example.com --keyword "best practices for SaaS onboarding"
+  opengtm keywords --domain example.com --limit 50
+  opengtm sitemap --url https://example.com
         """,
     )
     sub = parser.add_subparsers(dest="command")
@@ -373,6 +559,53 @@ Examples:
     p_sync.add_argument("--input", required=True, help="JSON file with generated leads")
     p_sync.add_argument("--dry-run", action="store_true", help="Print without posting")
 
+    # context
+    p_ctx = sub.add_parser("context", help="Extract company context from a URL")
+    p_ctx.add_argument("--url", "-u", required=True, help="Company website URL")
+    p_ctx.add_argument("--output", "-o", help="Output JSON path (default: /tmp/opengtm-context.json)")
+    p_ctx.add_argument("--country", help="Target market country (e.g. 'DE', 'US')")
+    p_ctx.add_argument("--language", help="Target market language (e.g. 'de', 'en')")
+    p_ctx.add_argument("--strict", action="store_true", help="Raise error instead of falling back on API failure")
+
+    # analytics
+    p_anl = sub.add_parser("analytics", help="AEO health check (29 checks) + AI visibility")
+    p_anl.add_argument("--url", "-u", help="Company website URL")
+    p_anl.add_argument("--company", "-c", help="Company name (for mentions check)")
+    p_anl.add_argument("--industry", help="Industry (for mentions check)")
+    p_anl.add_argument("--health-only", action="store_true", help="Run health check only")
+    p_anl.add_argument("--mentions-only", action="store_true", help="Run mentions check only")
+    p_anl.add_argument("--output", "-o", help="Output JSON path (default: /tmp/opengtm-analytics.json)")
+
+    # blog
+    p_blog = sub.add_parser("blog", help="Generate a blog article with Gemini + Google Search")
+    p_blog.add_argument("--domain", "-d", required=True, help="Company website domain or URL")
+    p_blog.add_argument("--keyword", "-k", required=True, help="Primary SEO keyword")
+    p_blog.add_argument("--context", help="JSON file with company context (from opengtm context)")
+    p_blog.add_argument("--word-count", type=int, default=2000, help="Target word count (default 2000)")
+    p_blog.add_argument("--language", default="en", help="Language code (default: en)")
+    p_blog.add_argument("--country", default="United States", help="Target country/region")
+    p_blog.add_argument("--verify-urls", action="store_true", help="Verify all links in article")
+    p_blog.add_argument("--output", "-o", help="Output JSON path (default: /tmp/opengtm-blog.json)")
+
+    # keywords
+    p_kw = sub.add_parser("keywords", help="Research SEO keywords (7-stage AI pipeline)")
+    p_kw.add_argument("--domain", "-d", required=True, help="Company website domain or URL")
+    p_kw.add_argument("--context", help="JSON file with company context (from opengtm context)")
+    p_kw.add_argument("--limit", "-n", type=int, default=50, help="Max keywords to return (default 50)")
+    p_kw.add_argument("--language", default="en", help="Language code (default: en)")
+    p_kw.add_argument("--region", default="US", help="Target region code (default: US)")
+    p_kw.add_argument("--min-score", type=int, default=20, help="Min company-fit score 0-100 (default 20)")
+    p_kw.add_argument("--clusters", type=int, default=5, help="Number of semantic clusters (default 5)")
+    p_kw.add_argument("--no-briefs", action="store_true", help="Skip content brief generation")
+    p_kw.add_argument("--output", "-o", help="Output JSON path (default: /tmp/opengtm-keywords.json)")
+
+    # sitemap
+    p_sm = sub.add_parser("sitemap", help="Crawl and classify sitemap URLs by type")
+    p_sm.add_argument("--url", "-u", required=True, help="Company website URL")
+    p_sm.add_argument("--validate", action="store_true", help="Validate each URL with HEAD request")
+    p_sm.add_argument("--max-urls", type=int, default=500, help="Max URLs to return (default 500)")
+    p_sm.add_argument("--output", "-o", help="Output JSON path (default: /tmp/opengtm-sitemap.json)")
+
     args = parser.parse_args()
 
     if not args.command:
@@ -387,6 +620,11 @@ Examples:
         "pipeline": cmd_pipeline,
         "outreach": cmd_outreach,
         "sync": cmd_sync,
+        "context": cmd_context,
+        "analytics": cmd_analytics,
+        "blog": cmd_blog,
+        "keywords": cmd_keywords,
+        "sitemap": cmd_sitemap,
     }
     dispatch[args.command](args)
 
