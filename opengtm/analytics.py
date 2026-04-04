@@ -33,6 +33,8 @@ import time
 from typing import Any, Dict, List, Optional, Set, Tuple
 from urllib.parse import urlparse
 
+from . import DEFAULT_MODEL
+
 logger = logging.getLogger(__name__)
 
 
@@ -1196,7 +1198,7 @@ Return as JSON array:
 
         # Generate queries
         resp = client.models.generate_content(
-            model="gemini-2.0-flash",
+            model=DEFAULT_MODEL,
             contents=gen_prompt,
             config=new_types.GenerateContentConfig(temperature=0.3),
         )
@@ -1222,7 +1224,7 @@ Return as JSON array:
                 continue
             try:
                 qresp = client.models.generate_content(
-                    model="gemini-2.0-flash",
+                    model=DEFAULT_MODEL,
                     contents=f"Answer this query concisely: {query}",
                     config=new_types.GenerateContentConfig(temperature=0.3),
                 )
@@ -1246,7 +1248,7 @@ Return as JSON array:
         # Fallback to google-generativeai
         import google.generativeai as genai
         genai.configure(api_key=key)
-        model = genai.GenerativeModel("gemini-2.0-flash")
+        model = genai.GenerativeModel(DEFAULT_MODEL)
 
         resp = model.generate_content(gen_prompt)
         ai_calls += 1

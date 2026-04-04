@@ -28,6 +28,8 @@ import re
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple, Any
 
+from . import DEFAULT_MODEL
+
 logger = logging.getLogger(__name__)
 
 
@@ -58,7 +60,7 @@ async def _gemini_generate(
             tools.append(new_types.Tool(google_search=new_types.GoogleSearch()))
 
         response = client.models.generate_content(
-            model="gemini-2.0-flash",
+            model=DEFAULT_MODEL,
             contents=prompt,
             config=new_types.GenerateContentConfig(
                 tools=tools if tools else None,
@@ -71,7 +73,7 @@ async def _gemini_generate(
         import google.generativeai as genai
         genai.configure(api_key=key)
         model = genai.GenerativeModel(
-            model_name="gemini-2.0-flash",
+            model_name=DEFAULT_MODEL,
             generation_config={
                 "temperature": temperature,
                 "response_mime_type": "application/json",

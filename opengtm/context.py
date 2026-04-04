@@ -19,6 +19,8 @@ import os
 from typing import Optional
 from urllib.parse import urlparse
 
+from . import DEFAULT_MODEL
+
 logger = logging.getLogger(__name__)
 
 
@@ -186,7 +188,7 @@ async def _run_extraction(url: str, api_key: Optional[str] = None,
         from google.genai import types as new_types
 
         response = client.models.generate_content(
-            model="gemini-2.0-flash",
+            model=DEFAULT_MODEL,
             contents=prompt,
             config=new_types.GenerateContentConfig(
                 tools=[new_types.Tool(google_search=new_types.GoogleSearch())],
@@ -197,7 +199,7 @@ async def _run_extraction(url: str, api_key: Optional[str] = None,
     except Exception:
         # Fallback to older SDK
         model = genai.GenerativeModel(
-            model_name="gemini-2.0-flash",
+            model_name=DEFAULT_MODEL,
             generation_config={"temperature": 0.3, "response_mime_type": "application/json"},
         )
         response = model.generate_content(prompt)

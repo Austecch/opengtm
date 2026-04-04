@@ -28,6 +28,8 @@ import re
 from datetime import datetime, timezone
 from typing import Optional, Set
 
+from . import DEFAULT_MODEL
+
 logger = logging.getLogger(__name__)
 
 # Similarity thresholds (verbatim from source)
@@ -286,7 +288,7 @@ async def _generate_with_gemini(
 
         client = new_genai.Client(api_key=key)
         response = client.models.generate_content(
-            model="gemini-2.0-flash",
+            model=DEFAULT_MODEL,
             contents=prompt,
             config=new_types.GenerateContentConfig(
                 system_instruction=system_instruction,
@@ -302,7 +304,7 @@ async def _generate_with_gemini(
         import google.generativeai as genai
         genai.configure(api_key=key)
         model = genai.GenerativeModel(
-            model_name="gemini-2.0-flash",
+            model_name=DEFAULT_MODEL,
             generation_config={
                 "temperature": 0.3,
                 "max_output_tokens": 16384,

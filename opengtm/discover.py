@@ -14,8 +14,9 @@ import time
 import urllib.request
 from typing import Optional
 
+from . import DEFAULT_MODEL
 
-MODEL = os.environ.get("GEMINI_MODEL", "gemini-3-flash-preview")
+MODEL = os.environ.get("GEMINI_MODEL", DEFAULT_MODEL)
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 
 

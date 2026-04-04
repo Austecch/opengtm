@@ -1,46 +1,44 @@
 [build-system]
-requires = ["setuptools>=70.0", "wheel"]
-build-backend = "setuptools.backends.legacy:build"
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "opengtm"
 version = "0.1.0"
-description = "AI-powered GTM automation: discover leads, research prospects, score ICP fit, generate outreach. Built for Claude Code users."
+description = "AI-powered GTM automation: lead generation, ICP scoring, AEO health check, content pipeline. Built for Claude Code."
 readme = "README.md"
-license = { text = "MIT" }
+license = {text = "MIT"}
 authors = [
     { name = "Federico De Ponte", email = "depontefede@gmail.com" }
 ]
-keywords = [
-    "gtm", "lead-generation", "outreach", "sales-automation",
-    "ai-automation", "claude-code", "prospect-research", "icp-scoring"
-]
+requires-python = ">=3.10"
+keywords = ["gtm", "lead-generation", "aeo", "answer-engine-optimization", "outreach", "seo", "ai-automation", "claude-code", "icp-scoring", "cold-outreach"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
+    "Topic :: Office/Business",
     "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
-    "Topic :: Office/Business",
-    "Topic :: Internet :: WWW/HTTP",
 ]
-requires-python = ">=3.10"
 dependencies = [
-    "google-generativeai==0.8.5",
-    "requests==2.32.3",
-    "click==8.1.8",
-    "python-dotenv==1.0.1",
+    "google-genai>=1.0.0",
+    "requests>=2.31.0",
+    "click>=8.1.0",
+    "python-dotenv>=1.0.0",
+    "beautifulsoup4>=4.12.0",
+    "lxml>=5.0.0",
+    "httpx>=0.27.0",
 ]
-
-[project.urls]
-Homepage = "https://github.com/federicodeponte/opengtm"
-Repository = "https://github.com/federicodeponte/opengtm"
-Issues = "https://github.com/federicodeponte/opengtm/issues"
 
 [project.scripts]
 opengtm = "opengtm.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/buildingopen/opengtm"
+Repository = "https://github.com/buildingopen/opengtm"
+Issues = "https://github.com/buildingopen/opengtm/issues"
 
 [tool.setuptools.packages.find]
 where = ["."]
