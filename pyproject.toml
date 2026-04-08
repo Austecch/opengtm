@@ -40,6 +40,9 @@ Homepage = "https://github.com/buildingopen/opengtm"
 Repository = "https://github.com/buildingopen/opengtm"
 Issues = "https://github.com/buildingopen/opengtm/issues"
 
+[tool.setuptools]
+license-files = []
+
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["opengtm*"]
