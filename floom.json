@@ -1,0 +1,135 @@
+{
+  "name": "OpenGTM",
+  "description": "Open source AI GTM toolkit. AEO health scoring and ICP lead qualification, straight from the terminal. MIT licensed alternative to Clay, Apollo, and Semrush.",
+  "manifest_version": "2.0",
+  "runtime": "python",
+  "python_dependencies": [
+    "httpx>=0.27.0",
+    "beautifulsoup4>=4.12.0",
+    "lxml>=5.0.0",
+    "requests>=2.31.0",
+    "python-dotenv>=1.0.0"
+  ],
+  "secrets_needed": [],
+  "actions": {
+    "aeo_health": {
+      "label": "AEO Health Check",
+      "description": "Run 29 checks across technical SEO, structured data, AI crawler access, and authority signals. Returns a tiered score and letter grade (A+ to F) so you know whether ChatGPT and Perplexity can actually find you.",
+      "inputs": [
+        {
+          "name": "url",
+          "label": "URL",
+          "type": "url",
+          "required": true,
+          "description": "Page to analyze.",
+          "placeholder": "https://floom.dev"
+        },
+        {
+          "name": "timeout",
+          "label": "Timeout (seconds)",
+          "type": "number",
+          "required": false,
+          "default": 30,
+          "description": "HTTP request timeout."
+        }
+      ],
+      "outputs": [
+        {
+          "name": "url",
+          "label": "URL",
+          "type": "text"
+        },
+        {
+          "name": "score",
+          "label": "Score",
+          "type": "number"
+        },
+        {
+          "name": "grade",
+          "label": "Grade",
+          "type": "text"
+        },
+        {
+          "name": "band",
+          "label": "Band",
+          "type": "text"
+        },
+        {
+          "name": "checks_passed",
+          "label": "Checks Passed",
+          "type": "number"
+        },
+        {
+          "name": "checks_failed",
+          "label": "Checks Failed",
+          "type": "number"
+        },
+        {
+          "name": "issues",
+          "label": "Issues",
+          "type": "json"
+        },
+        {
+          "name": "tier_details",
+          "label": "Tier Details",
+          "type": "json"
+        }
+      ]
+    },
+    "score_lead": {
+      "label": "Score Lead (ICP)",
+      "description": "Score a lead on ICP fit (0-100) across six dimensions (size, industry, digital maturity, pain signals, revenue, contact quality). Returns tier (hot/warm/cold) and a recommended next action.",
+      "inputs": [
+        {
+          "name": "lead",
+          "label": "Lead",
+          "type": "json",
+          "required": true,
+          "description": "Lead object with at minimum: domain, company, industry. Optionally includes research_data from opengtm research.py."
+        },
+        {
+          "name": "icp_profile",
+          "label": "ICP Profile",
+          "type": "text",
+          "required": false,
+          "default": "default",
+          "description": "Built-in profile key: default, saas, agency, enterprise, ..."
+        },
+        {
+          "name": "custom_profile",
+          "label": "Custom Profile (optional)",
+          "type": "json",
+          "required": false,
+          "description": "Full ICP profile object to override the preset."
+        }
+      ],
+      "outputs": [
+        {
+          "name": "score",
+          "label": "Score",
+          "type": "number"
+        },
+        {
+          "name": "tier",
+          "label": "Tier",
+          "type": "text"
+        },
+        {
+          "name": "recommended_action",
+          "label": "Recommended Action",
+          "type": "text"
+        },
+        {
+          "name": "reasons",
+          "label": "Reasons",
+          "type": "json"
+        },
+        {
+          "name": "breakdown",
+          "label": "Breakdown",
+          "type": "json"
+        }
+      ]
+    }
+  }
+}
