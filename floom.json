@@ -82,10 +82,11 @@
       "inputs": [
         {
           "name": "lead",
-          "label": "Lead",
-          "type": "json",
+          "label": "Lead (JSON)",
+          "type": "textarea",
           "required": true,
-          "description": "Lead object with at minimum: domain, company, industry. Optionally includes research_data from opengtm research.py."
+          "description": "Lead object as JSON. Minimum: { \"domain\": \"...\", \"company\": \"...\", \"industry\": \"...\" }. Optionally include research_data from opengtm research.py.",
+          "placeholder": "{\"domain\": \"acme.com\", \"company\": \"Acme\", \"industry\": \"B2B SaaS\"}"
         },
         {
           "name": "icp_profile",
@@ -97,10 +98,10 @@
         },
         {
           "name": "custom_profile",
-          "label": "Custom Profile (optional)",
-          "type": "json",
+          "label": "Custom Profile (optional JSON)",
+          "type": "textarea",
           "required": false,
-          "description": "Full ICP profile object to override the preset."
+          "description": "Full ICP profile object as JSON to override the preset. Leave empty to use the built-in profile."
         }
       ],
       "outputs": [
