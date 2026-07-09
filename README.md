@@ -2,6 +2,12 @@
 
 # opengtm
 
+<p align="center">
+  <a href="https://opengtm-deploy.vercel.app"><img src="https://img.shields.io/badge/Deployed-Vercel-black?logo=vercel&style=for-the-badge" alt="Vercel" /></a>
+  <a href="https://opengtm-deploy.vercel.app/health"><img src="https://img.shields.io/badge/API%20Status-Online-brightgreen?style=for-the-badge" alt="API Status" /></a>
+</p>
+
+
 **Open source AI GTM toolkit.** Find leads, score ICP fit, generate outreach, audit AEO health, and research keywords — all from your terminal.
 
 No Clay. No Apollo. No Semrush. Just a Gemini API key.
