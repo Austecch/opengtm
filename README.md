@@ -3,8 +3,8 @@
 # opengtm
 
 <p align="center">
-  <a href="https://opengtm-deploy.vercel.app"><img src="https://img.shields.io/badge/Deployed-Vercel-black?logo=vercel&style=for-the-badge" alt="Vercel" /></a>
-  <a href="https://opengtm-deploy.vercel.app/health"><img src="https://img.shields.io/badge/API%20Status-Online-brightgreen?style=for-the-badge" alt="API Status" /></a>
+  <a href="https://opengtm-redeploy.vercel.app"><img src="https://img.shields.io/badge/Deployed-Vercel-black?logo=vercel&style=for-the-badge" alt="Vercel" /></a>
+  <a href="https://opengtm-redeploy.vercel.app/health"><img src="https://img.shields.io/badge/API%20Status-Online-brightgreen?style=for-the-badge" alt="API Status" /></a>
 </p>
 
 
